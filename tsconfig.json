@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "allowJs": true,
+    "strict": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["unplugin-vue-macros/macros-global" /* ... */],
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "vueCompilerOptions": {
+    "plugins": [
+      // "@vue-macros/volar/define-model",
+      // "@vue-macros/volar/short-vmodel",
+      "@vue-macros/volar/define-slots"
+      // ...more feature
+    ]
+    // ...
+  },
+  "include": ["global.d.ts", "src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/pages/demo/chart.jsx", "src/pages/demo/chart.jsx"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
