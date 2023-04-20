@@ -2,6 +2,7 @@ import axios from 'axios';
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { baseURL } from './api';
 import { IS_DEV } from '@/utils/const';
+import { showToast } from 'vant';
 
 interface CommonResponse<T = unknown> {
   code: number;
@@ -10,14 +11,13 @@ interface CommonResponse<T = unknown> {
   page: T;
 }
 
-
 export default <T = unknown>(
   options: AxiosRequestConfig & { service?: any }
 ): Promise<CommonResponse<T>> =>
   new Promise((resolve, reject) => {
     console.log('%c [ xxx ]', 'font-size:13px; background:pink; color:#bf2c9f;', IS_DEV());
     // 创建一个axios实例
-    const obj = {
+    const obj: any = {
       baseURL: options.baseURL ? options.baseURL : IS_DEV() ? '/api' : baseURL,
       withCredentials: true,
       headers: options.headers ? options.headers : { 'Content-Type': 'application/json' },
@@ -45,7 +45,13 @@ export default <T = unknown>(
           const responseBody = JSON.parse(response.request.response);
 
           // 未登录或登录失效，跳转登录页面
-          if ('code' in responseBody && responseBody.code === 401) window.location.href = '/#/404';
+          if (responseBody.code === 401 || responseBody.code === 403) {
+            window.location.href = '/#/404';
+          } else if (responseBody.code !== 200) {
+            showToast({ type: 'fail', message: responseBody.msg });
+            return;
+          }
+          resolve(responseBody);
         } catch (e) {
           return response;
         }
@@ -53,25 +59,10 @@ export default <T = unknown>(
       },
 
       (error: AxiosError) => {
-        // 未登录或登录失效，跳转登录页面
-        if (String(error).includes('401')) {
-          window.location.href = '/#/404';
-        }
-        error;
+        console.log('%c [ error ]', 'font-size:13px; background:pink; color:#bf2c9f;', error);
+        reject(error);
       }
     );
     // 发送请求
-    instance
-      .request<any, T>(obj)
-      .then((res: any) => {
-        try {
-          resolve(JSON.parse(res.request.response));
-        } catch (e) {
-          resolve(res.request.response);
-        }
-        //  resolve(JSON.parse(res.request.response));
-      })
-      .catch((err: any) => {
-        reject(err);
-      });
+    instance.request<any, T>(obj);
   });
